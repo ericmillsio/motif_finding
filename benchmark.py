@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import sys, random, math
-from pyfasta import Fasta
 import numpy as np
 
 
@@ -35,14 +34,21 @@ def main(argv):
    with open('motif.txt', 'w') as f:
       f.write(">MOTIF1" + "\t" + str(ml) + "\n")
       for i, s in enumerate(motif):
-         for x in s[0]:
+         for x in s:
             f.write(str(x) + "\t")
          f.write("\n")
+      f.write("<\n")
+
+   with open('norm.txt', 'w') as f:
+      f.write(">MOTIF1" + "\t" + str(ml) + "\n")
+      for i, s in enumerate(norm):
+         for x in s:
+            f.write(str(x) + "\t")
+         f.write("\n")
+      f.write("<\n")
 
    with open('motiflength.txt', 'w') as f:
       f.write(str(ml))
-
-   sys.exit()
 
 
 def plant(seq, site):
@@ -58,8 +64,17 @@ def gen_motif(icpc, ml):
    for x in range(ml):
       found_one = False
       while not found_one:
-         # generate random row
-         col = np.random.randint(1,100000000,size=(1,4))
+         # generate random col
+         n = 1000000
+         a = random.randint(0,n)
+         c = random.randint(0,n-a)
+         g = random.randint(0,n-a-c)
+         t = n-a-c-g
+         col = [a,c,g,t]
+         random.shuffle(col)
+         col = np.array(col)
+         if col.sum() < 20:
+            continue
          norm = (1*col).astype(float)
          # normalize
          norm /= norm.sum()
@@ -73,7 +88,8 @@ def gen_motif(icpc, ml):
 def sample_motif(motif):
    sample = []
    for col in motif:
-      sample.append( select_from_distrib(col[0].tolist()) )
+      sample.append( select_from_distrib(col.tolist()) )
+   print sample
    return sample
 
 def select_from_distrib(distrib):
@@ -87,8 +103,10 @@ def select_from_distrib(distrib):
 
 def info_content(col, bg, icpc):
    ic = 0
-   for n in col[0]:
-      ic += n * math.log(n/bg)
+   for n in col:
+      if n == 0:
+         continue
+      ic += n * math.log((n*1.0)/(bg*1.0), 2)
    return ic, icpc-0.2 <= ic <= icpc+0.2
       
 def gen_seq(sl):
