@@ -13,14 +13,14 @@ def main(argv):
       icpc, ml, sl, sc = float(icpc), int(ml), int(sl), int(sc)
 
    except Exception:
-      print "Invalid input, follow rules below:"
+      print "Invalid input, follow rules below"
       sys.exit(2)
 
    seqs = [gen_seq(sl) for i in range(sc)]
    # print seqs
-   motif = gen_motif(icpc, ml)
+   motif, norm = gen_motif(icpc, ml)
    # print motif
-   samples = [sample_motif(motif) for i in range(sc)]
+   samples = [sample_motif(norm) for i in range(sc)]
 
    seqs = [plant(seq, samp) for samp, seq in  zip(samples, seqs)]
 
@@ -54,18 +54,21 @@ def plant(seq, site):
 
 def gen_motif(icpc, ml):
    motif = []
+   norm_motif = []
    for x in range(ml):
       found_one = False
       while not found_one:
          # generate random row
-         col = np.random.uniform(100000000,size=(1,4))
+         col = np.random.randint(1,100000000,size=(1,4))
+         norm = (1*col).astype(float)
          # normalize
-         col /= col.sum()
-         ic, within_rng = info_content(col, 0.25, icpc)
+         norm /= norm.sum()
+         ic, within_rng = info_content(norm, 0.25, icpc)
          if within_rng:
             motif.append(col)
+            norm_motif.append(norm)
             found_one = True
-   return motif
+   return motif, norm_motif
 
 def sample_motif(motif):
    sample = []
