@@ -10,7 +10,7 @@ scs = [5,10,20]
 DEF_ICPC = 2
 DEF_ML = 8
 DEF_SC = 10
-DEF_SL = 50
+DEF_SL = 500
 
 root = os.getcwd()
 

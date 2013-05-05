@@ -17,7 +17,7 @@ def main(argv):
 
    seqs = [gen_seq(sl) for i in range(sc)]
    # print seqs
-   motif, norm = gen_motif(icpc, ml)
+   motif, norm = gen_motif(icpc, ml, sc)
    # print motif
    samples = [sample_motif(norm) for i in range(sc)]
 
@@ -58,14 +58,14 @@ def plant(seq, site):
    return (seq, pos)
 
 
-def gen_motif(icpc, ml):
+def gen_motif(icpc, ml, sc):
    motif = []
    norm_motif = []
    for x in range(ml):
       found_one = False
       while not found_one:
          # generate random col
-         n = 1000000
+         n = sc
          a = random.randint(0,n)
          c = random.randint(0,n-a)
          g = random.randint(0,n-a-c)
@@ -73,7 +73,7 @@ def gen_motif(icpc, ml):
          col = [a,c,g,t]
          random.shuffle(col)
          col = np.array(col)
-         if col.sum() < 20:
+         if col.sum() < sc:
             continue
          norm = (1*col).astype(float)
          # normalize

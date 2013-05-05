@@ -15,17 +15,19 @@ def addResults(folder):
 
 		result = {}
 
+		#Get runtime of algorithm
 		result["time"] = timing.run()
+
+		#Compare Predicted and Actual Sites and Find the hits
 		fileActual = open("sites.txt")
 		filePredict = open("predictedsites.txt")
-
 		linesActual = fileActual.read().splitlines()	
 		linesPredict = filePredict.read().splitlines()	
 
 		count = 0
 		
 		for i in range(0, len(linesActual)):
-			if linesActual[i] == linesPredict[i]:
+			if abs(int(linesActual[i].split()[1]) - int(linesPredict[i].split()[1])) < 2 :
 				count += 1
 
 		result["hits"] = count
@@ -33,21 +35,22 @@ def addResults(folder):
 		fileActual.close()
 		filePredict.close()
 
+		#Compare the Motifs
 		fileNorm = open("norm.txt")
 		fileMotifPredicted = open("predictedmotif.txt")
-
 		linesActual = fileNorm.read().splitlines()
 		linesPredict = fileMotifPredicted.read().splitlines()
 	
 		divisor = sum(map(fi,linesPredict[1].split()))
 	
+		#Get Relative Entropy between motifs
 		runningSum = 0.0
 	
 		for i in range(1, len(linesActual)-1):
 			numsActual = map(float, linesActual[i].split())
 			numsPredict = map(fi, linesPredict[i].split())
 			for j in range(0, 4):
-				runningSum += numsActual[j] * math.log((numsActual[j]*divisor+0.00001)/(numsPredict[j]+0.00001))
+				runningSum += numsActual[j] * math.log((numsActual[j]*divisor+0.00001)/(numsPredict[j]+0.00001), 10)
 
 		result["re"] = runningSum
 
@@ -64,7 +67,7 @@ addResults("sc")
 
 os.chdir(root)
 
-with open("all_results.txt", "w") as f:
+with open("all_results.csv", "w") as f:
 	f.write("type,val,re,hits,time\n")
 	for i in range(0,30):
 		res = results["ml"+str(i)]
